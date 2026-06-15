@@ -7,9 +7,9 @@
 #define WIDTH 1200
 #define HEIGHT 600
 #define FPS 60
-#define NUM_CHARGES 300
-#define SPEED 10
-#define FACTOR 7000
+#define NUM_CHARGES 500
+#define SPEED 5
+#define FACTOR 20000
 #define RADIUS 6
 
 typedef struct {
@@ -28,7 +28,7 @@ void InitCharges() {
     charges[i].vy = GetRandomValue(-SPEED, SPEED);
     charges[i].fx = 0;
     charges[i].fy = 0;
-    charges[i].charge = rand() %2 == 0 ? 1 : -1;
+    charges[i].charge = rand() %11 <= 2 ? 1 : -1;
   }
 }
 
