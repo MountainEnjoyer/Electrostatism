@@ -7,9 +7,10 @@
 #define WIDTH 1200
 #define HEIGHT 600
 #define FPS 60
-#define NUM_CHARGES 30
-#define SPEED 20
-#define FACTOR 5000
+#define NUM_CHARGES 300
+#define SPEED 10
+#define FACTOR 7000
+#define RADIUS 6
 
 typedef struct {
   float x, y, radius, vx, vy, fx, fy;  
@@ -19,16 +20,15 @@ typedef struct {
 Charge charges[NUM_CHARGES];
 
 void InitCharges() {
-  float r = 10;
   for (int i = 0; i<NUM_CHARGES; i++) {
-    charges[i].radius = r;
-    charges[i].x = GetRandomValue(r, WIDTH-r);
-    charges[i].y = GetRandomValue(r, HEIGHT-r);
+    charges[i].radius = RADIUS;
+    charges[i].x = GetRandomValue(RADIUS, WIDTH-RADIUS);
+    charges[i].y = GetRandomValue(RADIUS, HEIGHT-RADIUS);
     charges[i].vx = GetRandomValue(-SPEED, SPEED);
     charges[i].vy = GetRandomValue(-SPEED, SPEED);
     charges[i].fx = 0;
     charges[i].fy = 0;
-    charges[i].charge = 1;
+    charges[i].charge = rand() %2 == 0 ? 1 : -1;
   }
 }
 
@@ -61,11 +61,10 @@ void ComputeForce() {
       float dx = c2->x - c1->x;
       float dy = c2->y - c1->y;
       float d2 = dx*dx + dy*dy;
+      if (d2 < 1) 
+        d2=1;
 
       float d = sqrtf(d2);
-      if (d < 1) 
-        d =1;
-
       float nx = dx / d;
       float ny = dy / d;
 
@@ -99,6 +98,9 @@ void UpdateCharges(float dt) {
     c->vy += c->fy * dt;
     c->x += c->vx * dt;
     c->y += c->vy * dt;
+
+    c->vy *= 0.99;
+    c->vx *= 0.99;
   }
 }
 
@@ -130,6 +132,7 @@ void CollideWalls() {
 int main() {
   InitWindow(WIDTH, HEIGHT, "Coulomb Force Simulation");
 
+  srand(time(NULL));
   SetTargetFPS(FPS); // CPU Usage
   InitCharges();
   while (!WindowShouldClose()) {
