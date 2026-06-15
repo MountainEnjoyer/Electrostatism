@@ -9,6 +9,7 @@
 #define FPS 60
 #define NUM_CHARGES 30
 #define SPEED 20
+#define FACTOR 5000
 
 typedef struct {
   float x, y, radius, vx, vy, fx, fy;  
@@ -68,7 +69,7 @@ void ComputeForce() {
       float nx = dx / d;
       float ny = dy / d;
 
-      float fcoulomb =  1000 * c1->charge * c2->charge / d2 ;
+      float fcoulomb =  FACTOR * c1->charge * c2->charge / d2 ;
       float fx = fcoulomb * nx;
       float fy = fcoulomb * ny;
 
@@ -77,6 +78,16 @@ void ComputeForce() {
       c2->fx = fx;
       c2->fy = fy;
     }
+  }
+}
+
+void ResetForces() {
+  Charge *c;
+  for (int i = 0; i < NUM_CHARGES; i++) {
+    c = &charges[i];
+
+    c->fx = 0;
+    c->fy = 0;
   }
 }
 
@@ -91,6 +102,31 @@ void UpdateCharges(float dt) {
   }
 }
 
+void CollideWalls() {
+  Charge *c;
+  for (int i = 0; i<NUM_CHARGES; i++) {
+    c = &charges[i];
+
+    if (c->x < c->radius) {
+      c->x = c->radius;
+      c->vx = -c->vx;
+    }
+    if (c->y < c->radius) {
+      c->y = c->radius;
+      c->vy = -c->vy;
+    }
+    if (c->x > WIDTH-c->radius) {
+      c->x = WIDTH-c->radius;
+      c->vx = -c->vx;
+    }
+    if (c->y > HEIGHT-c->radius) {
+      c->y = HEIGHT-c->radius;
+      c->vy = -c->vy;
+    }
+
+  }
+}
+
 int main() {
   InitWindow(WIDTH, HEIGHT, "Coulomb Force Simulation");
 
@@ -99,8 +135,10 @@ int main() {
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
+    ResetForces();
     ComputeForce();
     UpdateCharges(GetFrameTime());
+    CollideWalls();
     DrawCharges();
     EndDrawing();
   }
