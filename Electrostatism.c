@@ -46,6 +46,39 @@ void DrawCharges(){
   }
 }
 
+void ComputeForce() {
+  Charge *c1;
+  Charge *c2;
+
+  for (int i=0; i<NUM_CHARGES; i++) {
+    c1 = &charges[i];
+    
+    for (int j=i+1; j<NUM_CHARGES; j++ ) {
+      c2 = &charges[j];
+      
+      // la distance ?
+      float dx = c2->x - c1->x;
+      float dy = c2->y - c1->y;
+      float d2 = dx*dy + dx*dy;
+
+      float d = sqrtf(d2);
+      if (d < 1) 
+        d =1;
+      float nx = dx / d;
+      float ny = dy / d;
+
+      float fcoulomb =  1000 * c1->charge * c2->charge / d2 ;
+      float fx = fcoulomb * nx;
+      float fy = fcoulomb * ny;
+
+      c1->fx -= fx;
+      c1->fy -= fy;
+      c2->fx = fx;
+      c2->fy = fy;
+    }
+  }
+}
+
 int main() {
   InitWindow(WIDTH, HEIGHT, "Coulomb Force Simulation");
 
@@ -54,6 +87,7 @@ int main() {
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
+    ComputeForce();
     DrawCharges();
     EndDrawing();
   }
