@@ -59,11 +59,12 @@ void ComputeForce() {
       // la distance ?
       float dx = c2->x - c1->x;
       float dy = c2->y - c1->y;
-      float d2 = dx*dy + dx*dy;
+      float d2 = dx*dx + dy*dy;
 
       float d = sqrtf(d2);
       if (d < 1) 
         d =1;
+
       float nx = dx / d;
       float ny = dy / d;
 
@@ -79,6 +80,17 @@ void ComputeForce() {
   }
 }
 
+void UpdateCharges(float dt) {
+  Charge *c;
+  for (int i = 0; i<NUM_CHARGES; i++) {
+    c = &charges[i];
+    c->vx += c->fx * dt;
+    c->vy += c->fy * dt;
+    c->x += c->vx * dt;
+    c->y += c->vy * dt;
+  }
+}
+
 int main() {
   InitWindow(WIDTH, HEIGHT, "Coulomb Force Simulation");
 
@@ -88,6 +100,7 @@ int main() {
     BeginDrawing();
     ClearBackground(BLACK);
     ComputeForce();
+    UpdateCharges(GetFrameTime());
     DrawCharges();
     EndDrawing();
   }
