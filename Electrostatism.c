@@ -15,7 +15,7 @@ typedef struct {
   int charge; // pos or neg
 } Charge;
 
-Charge charge[NUM_CHARGES];
+Charge charges[NUM_CHARGES];
 
 void InitCharges() {
   float r = 10;
@@ -23,9 +23,26 @@ void InitCharges() {
     charges[i].radius = r;
     charges[i].x = GetRandomValue(r, WIDTH-r);
     charges[i].y = GetRandomValue(r, HEIGHT-r);
-    charges[i].fx = GetRandomValue(-SPEED, SPEED);
-    charges[i].fy = GetRandomValue(-SPEED, SPEED);
+    charges[i].vx = GetRandomValue(-SPEED, SPEED);
+    charges[i].vy = GetRandomValue(-SPEED, SPEED);
+    charges[i].fx = 0;
+    charges[i].fy = 0;
+    charges[i].charge = 1;
+  }
+}
 
+void DrawCharges(){
+  Color color;
+  for (int i = 0; i<NUM_CHARGES; i++) {
+    switch (charges[i].charge) {
+      case 1:
+        color = RED;
+        break;
+      case -1:
+        color = BLUE;
+        break;
+    }
+    DrawCircle(charges[i].x, charges[i].y, charges[i].radius, color);
   }
 }
 
@@ -37,6 +54,7 @@ int main() {
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
+    DrawCharges();
     EndDrawing();
   }
   CloseWindow();
